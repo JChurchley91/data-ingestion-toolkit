@@ -3,7 +3,4 @@ pipeline_type: "source"
 job_id: 1
 web_file_path: "https://archive.ics.uci.edu/ml/machine-learning-databases/00560/SeoulBikeData.csv"
 gcp_bucket: "data-ingestion-toolkit"
-landed_folder: "seoul_bikes"
 landed_file_name: "seoul_bikes.csv"
-cleansed_folder: "seoul_bikes"
-cleansed_file_name: "seoul_bikes.csv"

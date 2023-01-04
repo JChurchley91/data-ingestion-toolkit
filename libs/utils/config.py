@@ -1,5 +1,6 @@
 import yaml
 
+
 class YamlLoader:
     def __init__(self):
         pass
@@ -31,4 +32,3 @@ class ConfigLoader:
         """
         config = self._yaml_loader.load_yaml_file(self._config_filepath)
         return config
-
