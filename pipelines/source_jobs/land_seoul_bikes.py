@@ -1,10 +1,11 @@
 from utils.config import ConfigLoader
 from utils.validator import DFValidator
-from utils.metadata import MetadataWriter
 from utils.gcp import GcpCredentials
+from utils.logger import JobLogger
 
 import pandas as pd
 from pandas import DataFrame
+from datetime import datetime
 
 
 def parse_config_file(config_path="configs\source_jobs\land_seoul_bikes.yml"):
@@ -39,7 +40,7 @@ def upload_data_to_storage(config_file: dict, df: DataFrame) -> None:
     gcp_bucket = config_file["gcp_bucket"]
     gcp_client_bucket = gcp_storage_client.bucket(gcp_bucket)
     storage_blob = gcp_client_bucket.blob(
-        f"landed/{config_file['pipeline_name']}/{config_file['landed_file_name']}"
+        f"landed/{config_file['job_name']}/{config_file['landed_file_name']}"
     )
     storage_blob.upload_from_string(df.to_csv(index=False), "text/csv")
     return None
@@ -49,10 +50,23 @@ def ingest_seoul_bikes_data():
     """
     Called at file execution - run all neccesary steps of job sequentially.
     """
+    logger = JobLogger()
     config = parse_config_file()
-    df = download_csv_data(config)
-    df = validate_df_exists(df)
-    upload_data_to_storage(config, df)
+    job_id = config['job_id']
+    job_type = config['job_type']
+
+    try:
+        df = download_csv_data(config)
+        df = validate_df_exists(df)
+        upload_data_to_storage(config, df)
+        job_end_time = datetime.now()
+        job_log = logger.build_log_df(job_id, job_type, 'Succesful', job_end_time)
+        logger.insert_log_df(job_log)
+    except:
+        job_end_time = datetime.now()
+        job_log = logger.build_log_df(job_id, job_type, 'Failed', job_end_time)
+        logger.insert_log_df(job_log)
+
 
 
 if __name__ == "__main__":
