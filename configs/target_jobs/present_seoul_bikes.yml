@@ -1,7 +1,8 @@
-pipeline_name: "seoul_bikes"
-pipeline_type: "target"
+job_name: "present_seoul_bikes"
+job_type: "target"
 job_id: 3
 gcp_bucket: "data-ingestion-toolkit"
+cleansed_folder_name: 'seoul_bikes'
 cleansed_file_name: "seoul_bikes.csv"
 presented_dataset_name: "seoul_bikes"
 presented_table_name: "bookings_raw"

@@ -1,9 +1,11 @@
-pipeline_name: "seoul_bikes"
-pipeline_type: "target"
+job_name: "cleanse_seoul_bikes"
+job_type: "target"
 job_id: 2
 gcp_bucket: "data-ingestion-toolkit"
 landed_file_name: "seoul_bikes.csv"
+landed_folder_name: 'seoul_bikes'
 transformations:
   - create_index_primary_key: 'primary_key'
   - apply_schema: 'libs\schemas\seoul_bikes.yml'
+cleansed_folder_name: 'seoul_bikes'
 cleansed_file_name: "seoul_bikes.csv"

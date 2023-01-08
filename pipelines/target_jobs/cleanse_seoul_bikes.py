@@ -2,9 +2,12 @@ from utils.config import ConfigLoader
 from utils.validator import DFValidator
 from utils.metadata import MetadataWriter
 from utils.gcp import GcpCredentials
+from utils.logger import JobLogger
+
 from transformations.df_transformer import DfTransformer
 
 import pandas as pd
+from datetime import datetime
 from pandas import DataFrame
 
 
@@ -18,7 +21,9 @@ def parse_config_file(config_path="configs\\target_jobs\cleanse_seoul_bikes.yml"
 
 def download_landed_data(config_file: dict) -> DataFrame:
     gcp_bucket = config_file["gcp_bucket"]
-    landed_folder = f"{config_file['pipeline_name']}/{config_file['landed_file_name']}"
+    landed_folder = (
+        f"{config_file['landed_folder_name']}/{config_file['landed_file_name']}"
+    )
     landed_file_path = f"gs://{gcp_bucket}/landed/{landed_folder}"
     df = pd.read_csv(
         landed_file_path,
@@ -66,7 +71,7 @@ def upload_data_to_storage(config_file: dict, df: DataFrame) -> None:
     gcp_bucket = config_file["gcp_bucket"]
     gcp_client_bucket = gcp_storage_client.bucket(gcp_bucket)
     storage_blob = gcp_client_bucket.blob(
-        f"cleansed/{config_file['pipeline_name']}/{config_file['cleansed_file_name']}"
+        f"cleansed/{config_file['cleansed_folder_name']}/{config_file['cleansed_file_name']}"
     )
     storage_blob.upload_from_string(df.to_csv(index=False), "text/csv")
     return None
@@ -76,12 +81,29 @@ def cleanse_seoul_bikes_data():
     """
     Called at file execution - run all neccesary steps of job sequentially.
     """
+    logger = JobLogger()
     config = parse_config_file()
-    df = download_landed_data(config)
-    df = validate_df_exists(df)
-    df = add_datetime_metadata(df)
-    df = apply_transformations(df)
-    upload_data_to_storage(config, df)
+    job_id = config["job_id"]
+    job_name = config["job_name"]
+    job_type = config["job_type"]
+
+    try:
+        df = download_landed_data(config)
+        df = validate_df_exists(df)
+        df = add_datetime_metadata(df)
+        df = apply_transformations(df)
+        upload_data_to_storage(config, df)
+        job_end_time = datetime.now()
+        job_log = logger.build_log_df(
+            job_id, job_name, job_type, "Succesful", job_end_time
+        )
+        logger.insert_log_df(job_log)
+    except:
+        job_end_time = datetime.now()
+        job_log = logger.build_log_df(
+            job_id, job_name, job_type, "Failed", job_end_time
+        )
+        logger.insert_log_df(job_log)
 
 
 if __name__ == "__main__":

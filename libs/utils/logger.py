@@ -23,6 +23,7 @@ class JobLogger:
         schema = [
             bigquery.SchemaField("job_id", "INTEGER", mode="REQUIRED"),
             bigquery.SchemaField("job_run_id", "STRING", mode="REQUIRED"),
+            bigquery.SchemaField("job_name", "STRING", mode="REQUIRED"),
             bigquery.SchemaField("job_type", "STRING", mode="REQUIRED"),
             bigquery.SchemaField("job_status", "STRING", mode="REQUIRED"),
             bigquery.SchemaField("job_date", "DATE", mode="REQUIRED"),
@@ -45,7 +46,7 @@ class JobLogger:
         return table
 
     def build_log_df(
-        self, job_id, job_type, job_status, end_time
+        self, job_id, job_name, job_type, job_status, end_time
     ) -> DataFrame:
         """
         Build a dataframe containing the required data fields
@@ -59,6 +60,7 @@ class JobLogger:
         df = {
             "job_id": job_id,
             "job_run_id": f"{job_run_id}",
+            "job_name": f"{job_name}",
             "job_type": f"{job_type}",
             "job_status": job_status,
             "job_date": self.job_start_date,

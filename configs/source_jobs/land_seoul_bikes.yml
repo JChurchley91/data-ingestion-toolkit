@@ -1,6 +1,7 @@
-job_name: "seoul_bikes"
+job_name: "land_seoul_bikes"
 job_type: "source"
 job_id: 1
 web_file_path: "https://archive.ics.uci.edu/ml/machine-learning-databases/00560/SeoulBikeData.csv"
 gcp_bucket: "data-ingestion-toolkit"
+landed_folder_name: 'seoul_bikes'
 landed_file_name: "seoul_bikes.csv"

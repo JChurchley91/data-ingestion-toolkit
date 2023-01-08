@@ -1,8 +1,10 @@
 from utils.config import ConfigLoader
 from utils.validator import DFValidator
 from utils.gcp import GcpCredentials
+from utils.logger import JobLogger
 
 import pandas as pd
+from datetime import datetime
 from pandas import DataFrame
 
 
@@ -17,7 +19,7 @@ def parse_config_file(config_path="configs\\target_jobs\present_seoul_bikes.yml"
 def download_cleansed_data(config_file: dict) -> DataFrame:
     gcp_bucket = config_file["gcp_bucket"]
     cleansed_folder = (
-        f"{config_file['pipeline_name']}/{config_file['cleansed_file_name']}"
+        f"{config_file['cleansed_folder_name']}/{config_file['cleansed_file_name']}"
     )
     cleansed_file_path = f"gs://{gcp_bucket}/cleansed/{cleansed_folder}"
     df = pd.read_csv(
@@ -81,11 +83,28 @@ def present_seoul_bikes_data():
     """
     Called at file execution - run all neccesary steps of job sequentially.
     """
+    logger = JobLogger()
     config = parse_config_file()
-    df = download_cleansed_data(config)
-    df = validate_df_exists(df)
-    create_gcp_dataset(config)
-    create_gcp_table(config, df)
+    job_id = config["job_id"]
+    job_name = config["job_name"]
+    job_type = config["job_type"]
+
+    try:
+        df = download_cleansed_data(config)
+        df = validate_df_exists(df)
+        create_gcp_dataset(config)
+        create_gcp_table(config, df)
+        job_end_time = datetime.now()
+        job_log = logger.build_log_df(
+            job_id, job_name, job_type, "Succesful", job_end_time
+        )
+        logger.insert_log_df(job_log)
+    except:
+        job_end_time = datetime.now()
+        job_log = logger.build_log_df(
+            job_id, job_name, job_type, "Failed", job_end_time
+        )
+        logger.insert_log_df(job_log)
 
 
 if __name__ == "__main__":
