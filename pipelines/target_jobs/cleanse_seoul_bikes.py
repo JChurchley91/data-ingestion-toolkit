@@ -1,14 +1,14 @@
 from utils.config import ConfigLoader
 from utils.validator import DFValidator
-from transformations.df_transformer import DfTransformer
 from utils.metadata import MetadataWriter
 from utils.gcp import GcpCredentials
+from transformations.df_transformer import DfTransformer
 
 import pandas as pd
 from pandas import DataFrame
 
 
-def parse_config_file(config_path="configs\\target_jobs\seoul_bikes.yml"):
+def parse_config_file(config_path="configs\\target_jobs\cleanse_seoul_bikes.yml"):
     """
     Return config file contents using given config filepath.
     """

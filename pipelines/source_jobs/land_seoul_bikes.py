@@ -7,7 +7,7 @@ import pandas as pd
 from pandas import DataFrame
 
 
-def parse_config_file(config_path="configs\source_jobs\seoul_bikes.yml"):
+def parse_config_file(config_path="configs\source_jobs\land_seoul_bikes.yml"):
     """
     Return config file contents using given config filepath.
     """
@@ -50,9 +50,9 @@ def ingest_seoul_bikes_data():
     Called at file execution - run all neccesary steps of job sequentially.
     """
     config = parse_config_file()
-    source_df = download_csv_data(config)
-    source_df = validate_df_exists(source_df)
-    upload_data_to_storage(config, source_df)
+    df = download_csv_data(config)
+    df = validate_df_exists(df)
+    upload_data_to_storage(config, df)
 
 
 if __name__ == "__main__":
