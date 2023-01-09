@@ -1,7 +1,4 @@
-from testing.fixtures.utils import (
-    gcp_credentials_object,
-)
-from utils.gcp import GcpCredentials
+from testing.fixtures.utils import gcp_credentials_object
 import pytest
 
 
